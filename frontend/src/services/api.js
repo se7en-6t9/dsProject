@@ -103,4 +103,9 @@ export const workspaceAPI = {
 // Health check
 export const healthCheck = () => api.get("/health");
 
+// Cat API
+export const catAPI = {
+  getRandomCat: () => api.get("/api/cat"),
+};
+
 export default api;

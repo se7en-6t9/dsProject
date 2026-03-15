@@ -9,6 +9,7 @@ import {
 import { errorHandler } from "./middleware/errorHandler.js";
 import authRoutes from "./routes/auth.js";
 import workspaceRoutes from "./routes/workspace.js";
+import catRoutes from "./routes/cat.js";
 
 // Load environment variables
 dotenv.config();
@@ -51,6 +52,9 @@ app.use("/api/auth", authRoutes);
 
 // Workspace routes (protected)
 app.use("/api/workspace", workspaceRoutes);
+
+// Cat routes
+app.use("/api/cat", catRoutes);
 
 // 404 handler
 app.use((req, res) => {
