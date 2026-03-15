@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import FileTree from "../components/FileTree";
 import Editor from "../components/Editor";
-import { workspaceAPI } from "../services/api";
+import { workspaceAPI, catAPI } from "../services/api";
 
 function Dashboard({ setIsAuthenticated }) {
   const [files, setFiles] = useState([]);
@@ -14,6 +14,9 @@ function Dashboard({ setIsAuthenticated }) {
   const [showNewFolderModal, setShowNewFolderModal] = useState(false);
   const [newName, setNewName] = useState("");
   const [selectedParentId, setSelectedParentId] = useState(null);
+  const [showCatModal, setShowCatModal] = useState(false);
+  const [catImage, setCatImage] = useState(null);
+  const [catLoading, setCatLoading] = useState(false);
   const navigate = useNavigate();
 
   // Load files on component mount
@@ -120,6 +123,21 @@ function Dashboard({ setIsAuthenticated }) {
     }
   };
 
+  const handleGenerateCat = async () => {
+    setCatLoading(true);
+    setCatImage(null);
+    setShowCatModal(true);
+    try {
+      const response = await catAPI.getRandomCat();
+      setCatImage(response.data.cat);
+    } catch (err) {
+      setError("Failed to generate cat");
+      setShowCatModal(false);
+    } finally {
+      setCatLoading(false);
+    }
+  };
+
   return (
     <div className="dashboard">
       <div className="sidebar">
@@ -170,6 +188,13 @@ function Dashboard({ setIsAuthenticated }) {
             title="Create new folder"
           >
             + Folder
+          </button>
+          <button
+            className="btn-cat btn-small"
+            onClick={handleGenerateCat}
+            title="Generate a random cat"
+          >
+            🐱 Cat
           </button>
           <button
             className="btn-logout btn-small"
@@ -293,6 +318,47 @@ function Dashboard({ setIsAuthenticated }) {
                 disabled={!newName.trim()}
               >
                 Create
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cat Modal */}
+      {showCatModal && (
+        <div className="modal-overlay" onClick={() => setShowCatModal(false)}>
+          <div
+            className="modal cat-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">🐱 Random Cat</div>
+            <div className="modal-body cat-modal-body">
+              {catLoading ? (
+                <div className="loading">
+                  <div className="spinner"></div>
+                  <span>Fetching cat...</span>
+                </div>
+              ) : catImage ? (
+                <img
+                  src={catImage.url}
+                  alt="Random cat"
+                  className="cat-image"
+                />
+              ) : null}
+            </div>
+            <div className="modal-footer">
+              <button
+                className="btn-secondary"
+                onClick={() => setShowCatModal(false)}
+              >
+                Close
+              </button>
+              <button
+                className="btn-cat"
+                onClick={handleGenerateCat}
+                disabled={catLoading}
+              >
+                🐱 New Cat
               </button>
             </div>
           </div>
